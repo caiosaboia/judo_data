@@ -4,7 +4,7 @@ import pytest
 import pandas as pd
 from pathlib import Path
 
-from judo_data.exporter import export_csv, export_parquet, export_all
+from judo_data.exporter import export_csv, export_parquet, export_excel, export_sqlite, export_all
 
 
 @pytest.fixture
@@ -140,8 +140,51 @@ def test_export_all_parquet_only(sample_df, output_dir):
     assert (output_dir / "test_dataset.parquet").exists()
 
 
+def test_export_excel_creates_file(sample_df, tmp_path):
+    """export_excel deve criar um arquivo .xlsx no path especificado."""
+    filepath = tmp_path / "test.xlsx"
+    export_excel(sample_df, filepath)
+    assert filepath.exists()
+
+
+def test_export_excel_content_is_readable(sample_df, tmp_path):
+    """Arquivo Excel criado deve ser legível pelo pandas."""
+    filepath = tmp_path / "test.xlsx"
+    export_excel(sample_df, filepath)
+
+    loaded = pd.read_excel(filepath)
+    assert len(loaded) == 3
+    assert "athlete_id" in loaded.columns
+    assert loaded["first_name"].tolist() == ["Alice", "Bob", "Charlie"]
+
+
+def test_export_sqlite_creates_file_with_tables(sample_df, tmp_path):
+    """export_sqlite deve criar um arquivo .db e gravar as tabelas."""
+    import sqlite3
+    filepath = tmp_path / "test.db"
+    datasets = {"athletes": sample_df, "competitions": sample_df}
+    export_sqlite(datasets, filepath)
+    assert filepath.exists()
+
+    with sqlite3.connect(filepath) as conn:
+        for table in ["athletes", "competitions"]:
+            loaded = pd.read_sql(f"SELECT * FROM {table}", conn)
+            assert len(loaded) == 3
+            assert "athlete_id" in loaded.columns
+            assert loaded["first_name"].tolist() == ["Alice", "Bob", "Charlie"]
+
+
+def test_export_all_creates_excel_and_sqlite(sample_df, output_dir):
+    """export_all deve suportar e criar arquivos nos formatos excel e sqlite."""
+    datasets = {"test_dataset": sample_df}
+    export_all(datasets, output_dir, formats=["excel", "sqlite"])
+
+    assert (output_dir / "test_dataset.xlsx").exists()
+    assert (output_dir / "judo_data.db").exists()
+
+
 def test_export_empty_dataframe(tmp_path):
-    """Exportar DataFrame vazio deve funcionar sem erro."""
+    """Exportar DataFrame vazio deve funcionar sem erro nos 4 formatos."""
     empty_df = pd.DataFrame(columns=["a", "b", "c"])
 
     csv_path = tmp_path / "empty.csv"
@@ -151,3 +194,11 @@ def test_export_empty_dataframe(tmp_path):
     parquet_path = tmp_path / "empty.parquet"
     export_parquet(empty_df, parquet_path)
     assert parquet_path.exists()
+
+    excel_path = tmp_path / "empty.xlsx"
+    export_excel(empty_df, excel_path)
+    assert excel_path.exists()
+
+    db_path = tmp_path / "empty.db"
+    export_sqlite({"empty_table": empty_df}, db_path)
+    assert db_path.exists()

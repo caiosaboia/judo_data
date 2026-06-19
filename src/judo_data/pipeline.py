@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 async def run_pipeline(
     year: int,
     output_dir: Path | None = None,
+    formats: list[str] | None = None,
 ) -> dict[str, pd.DataFrame]:
     """Executa a pipeline completa de extração de dados de judô.
 
@@ -36,6 +37,9 @@ async def run_pipeline(
         Ano até o qual captar dados de competições.
     output_dir : Path, optional
         Diretório de saída para os datasets. Usa ``config.DATA_DIR`` se não informado.
+    formats : list[str], optional
+        Lista de formatos para exportação (e.g., ['parquet'], ['csv'], etc.).
+        Se não informado, usa EXPORT_FORMATS da config.
 
     Returns
     -------
@@ -44,6 +48,9 @@ async def run_pipeline(
     """
     if output_dir is None:
         output_dir = DATA_DIR
+
+    if formats is None:
+        formats = EXPORT_FORMATS
 
     fetcher = JudoFetcher()
 
@@ -111,7 +118,7 @@ async def run_pipeline(
 
     # --- 8. Exportar ---
     logger.info("Exportando datasets para %s...", output_dir)
-    export_all(datasets, output_dir, EXPORT_FORMATS)
+    export_all(datasets, output_dir, formats)
     logger.info("Pipeline concluída com sucesso!")
 
     for name, df in datasets.items():
@@ -143,10 +150,29 @@ def main():
         print("Erro: informe um ano válido (ex: 2024)")
         sys.exit(1)
 
-    print(f"\nIniciando pipeline para o ano {year}...")
+    print("\nEscolha o formato de exportação:")
+    print("  1. parquet (Padrão)")
+    print("  2. csv")
+    print("  3. excel")
+    print("  4. banco de dados (SQLite)")
+    try:
+        format_input = input("Opção (1-4): ").strip()
+    except EOFError:
+        format_input = "1"
+
+    if format_input == "2":
+        selected_format = "csv"
+    elif format_input == "3":
+        selected_format = "excel"
+    elif format_input == "4":
+        selected_format = "sqlite"
+    else:
+        selected_format = "parquet"
+
+    print(f"\nIniciando pipeline para o ano {year} com exportação em formato '{selected_format}'...")
     print()
 
-    datasets = asyncio.run(run_pipeline(year=year))
+    datasets = asyncio.run(run_pipeline(year=year, formats=[selected_format]))
 
     print()
     print("=" * 60)
@@ -155,8 +181,12 @@ def main():
     for name, df in datasets.items():
         print(f"  {name}: {len(df)} linhas x {len(df.columns)} colunas")
     print()
-    print(f"Arquivos salvos em: judo_data/{DATA_DIR}")
+    if selected_format == "sqlite":
+        print(f"Banco de dados SQLite salvo em: {DATA_DIR}/judo_data.db")
+    else:
+        print(f"Arquivos salvos em: {DATA_DIR}")
     print("=" * 60)
+
 
 
 if __name__ == "__main__":
