@@ -1,0 +1,33 @@
+[project]
+name = "judo-data"
+version = "0.1.0"
+description = "Pipeline de dados de competições de judô - extração, limpeza e exportação"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "httpx>=0.28",
+    "pandas>=2.2",
+    "pyarrow>=19.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.25",
+    "respx>=0.22",
+    "pytest-mock>=3.14",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+asyncio_mode = "auto"
+
+[tool.ty.environment]
+extra-paths = ["src"]
+
+[tool.pyright]
+extraPaths = ["src"]
+
+[tool.ruff]
+src = ["src"]
