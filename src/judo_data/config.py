@@ -15,6 +15,9 @@ ACTIONS = {
 # Rate limiting: delay entre requests (em segundos)
 REQUEST_DELAY = 0.5
 
+# Concorrência máxima para requisições
+MAX_CONCURRENT_REQUESTS = 5
+
 # Timeout para requests HTTP (em segundos)
 REQUEST_TIMEOUT = 30.0
 

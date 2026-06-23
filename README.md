@@ -127,5 +127,4 @@ pytest tests/ -v
 
 ## TODO's
 
-- Implementação de Paralelismo nas requisições de API
-- Mais formatos de dados para export
+- Mais formatos de dados para export;

@@ -203,3 +203,15 @@ async def test_fetcher_default_delay():
     """Fetcher sem argumento de delay deve usar o padrão da config."""
     fetcher = JudoFetcher()
     assert fetcher.delay > 0
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_fetcher_has_max_concurrent_attribute():
+    """Fetcher deve ter um atributo max_concurrent configurável."""
+    fetcher = JudoFetcher(max_concurrent=10)
+    assert fetcher.max_concurrent == 10
+
+    fetcher_default = JudoFetcher()
+    assert fetcher_default.max_concurrent == 5
+
