@@ -1,10 +1,16 @@
 """Testes para o módulo exporter — exportação de datasets em CSV e Parquet."""
 
-import pytest
-import pandas as pd
-from pathlib import Path
 
-from judo_data.exporter import export_csv, export_parquet, export_excel, export_sqlite, export_all
+import pandas as pd
+import pytest
+
+from judo_data.exporter import (
+    export_all,
+    export_csv,
+    export_excel,
+    export_parquet,
+    export_sqlite,
+)
 
 
 @pytest.fixture

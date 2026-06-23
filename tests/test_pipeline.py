@@ -1,12 +1,12 @@
 """Testes para o módulo pipeline — orquestrador da pipeline completa."""
 
-import pytest
-import pandas as pd
-from pathlib import Path
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, patch
 
-from judo_data.pipeline import run_pipeline
+import pandas as pd
+import pytest
+
 from judo_data.config import DATASET_NAMES
+from judo_data.pipeline import run_pipeline
 
 
 @pytest.fixture
@@ -22,6 +22,8 @@ def mock_fetcher(raw_competitions, raw_contests, raw_athletes):
         )
     )
     fetcher.fetch_all_athletes = AsyncMock(return_value=raw_athletes)
+    fetcher.max_concurrent = 5  # Must be int for Semaphore
+    fetcher.delay = 0  # No delay in tests
     return fetcher
 
 
@@ -58,7 +60,7 @@ async def test_pipeline_creates_output_files(
         await run_pipeline(year=2024, output_dir=tmp_path)
 
     # Verifica que os 3 datasets foram exportados em ambos os formatos
-    for key, name in DATASET_NAMES.items():
+    for _, name in DATASET_NAMES.items():
         assert (tmp_path / f"{name}.csv").exists(), f"{name}.csv não existe"
         assert (tmp_path / f"{name}.parquet").exists(), f"{name}.parquet não existe"
 
@@ -118,7 +120,7 @@ async def test_pipeline_creates_selected_output_format(
     with patch("judo_data.pipeline.JudoFetcher", return_value=mock_fetcher):
         await run_pipeline(year=2024, output_dir=tmp_path, formats=["excel"])
 
-    for key, name in DATASET_NAMES.items():
+    for _, name in DATASET_NAMES.items():
         assert (tmp_path / f"{name}.xlsx").exists(), f"{name}.xlsx não existe"
         assert not (tmp_path / f"{name}.csv").exists()
         assert not (tmp_path / f"{name}.parquet").exists()
@@ -133,6 +135,6 @@ async def test_pipeline_creates_sqlite_output(
         await run_pipeline(year=2024, output_dir=tmp_path, formats=["sqlite"])
 
     assert (tmp_path / "judo_data.db").exists()
-    for key, name in DATASET_NAMES.items():
+    for _, name in DATASET_NAMES.items():
         assert not (tmp_path / f"{name}.csv").exists()
 

@@ -1,8 +1,7 @@
 """Fixtures e dados mock compartilhados para os testes."""
 
-import pytest
 import pandas as pd
-
+import pytest
 
 # === Mock data: respostas simuladas da API IJF ===
 

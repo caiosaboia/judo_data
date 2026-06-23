@@ -15,6 +15,7 @@ import logging
 from pathlib import Path
 
 import pandas as pd
+from tqdm.asyncio import tqdm
 
 from judo_data.config import DATA_DIR, DATASET_NAMES, EXPORT_FORMATS
 from judo_data.exporter import export_all
@@ -95,8 +96,31 @@ async def run_pipeline(
     logger.info("Atletas únicos encontrados: %d", len(athlete_ids))
 
     # --- 4. Buscar informações dos atletas ---
-    logger.info("Buscando informações dos atletas (isso pode demorar devido ao rate limit da API)...")
-    raw_athletes = await fetcher.fetch_all_athletes(list(athlete_ids))
+    logger.info(
+        "Buscando informações dos atletas "
+        "(isso pode demorar devido ao rate limit da API)..."
+    )
+
+    semaphore = asyncio.Semaphore(fetcher.max_concurrent)
+
+    async def worker_with_progress(athlete_id: int, index: int) -> dict:
+        """Worker que busca um atleta e atualiza a barra de progresso."""
+        async with semaphore:
+            if fetcher.delay > 0:
+                await asyncio.sleep(index * fetcher.delay / fetcher.max_concurrent)
+            return await fetcher.fetch_athlete(athlete_id)
+
+    athlete_ids_list = list(athlete_ids)
+    tasks = [
+        worker_with_progress(aid, idx)
+        for idx, aid in enumerate(athlete_ids_list)
+    ]
+    raw_athletes = await tqdm.gather(
+        *tasks,
+        desc="Capturando atletas",
+        total=len(athlete_ids_list),
+        unit="atleta",
+    )
     # Filtra atletas que retornaram dados vazios
     raw_athletes = [a for a in raw_athletes if a]
     logger.info("Atletas com dados obtidos: %d", len(raw_athletes))
@@ -169,7 +193,10 @@ def main():
     else:
         selected_format = "parquet"
 
-    print(f"\nIniciando pipeline para o ano {year} com exportação em formato '{selected_format}'...")
+    print(
+        f"\nIniciando pipeline para o ano {year} "
+        f"com exportação em formato '{selected_format}'..."
+    )
     print()
 
     datasets = asyncio.run(run_pipeline(year=year, formats=[selected_format]))

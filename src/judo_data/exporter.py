@@ -1,7 +1,7 @@
 """Módulo exporter — exportação de DataFrames para CSV, Parquet, Excel e SQLite."""
 
-from pathlib import Path
 import sqlite3
+from pathlib import Path
 
 import pandas as pd
 

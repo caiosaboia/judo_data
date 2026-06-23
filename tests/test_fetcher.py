@@ -1,12 +1,11 @@
 """Testes para o módulo fetcher — coleta de dados da API IJF."""
 
-import pytest
 import httpx
+import pytest
 import respx
 
 from judo_data.config import BASE_URL
 from judo_data.fetcher import JudoFetcher
-
 
 # === Testes de fetch_competitions ===
 

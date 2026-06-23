@@ -9,7 +9,13 @@ import logging
 
 import httpx
 
-from judo_data.config import ACTIONS, BASE_URL, REQUEST_DELAY, REQUEST_TIMEOUT, MAX_CONCURRENT_REQUESTS
+from judo_data.config import (
+    ACTIONS,
+    BASE_URL,
+    MAX_CONCURRENT_REQUESTS,
+    REQUEST_DELAY,
+    REQUEST_TIMEOUT,
+)
 
 logger = logging.getLogger(__name__)
 logging.getLogger("httpx").setLevel(logging.WARNING)
@@ -37,7 +43,12 @@ class JudoFetcher:
     ) -> None:
         self.base_url = base_url or BASE_URL
         self.delay = delay if delay is not None else REQUEST_DELAY
-        self.max_concurrent = max(1, max_concurrent if max_concurrent is not None else MAX_CONCURRENT_REQUESTS)
+        self.max_concurrent = max(
+            1,
+            max_concurrent
+            if max_concurrent is not None
+            else MAX_CONCURRENT_REQUESTS,
+        )
 
     # ------------------------------------------------------------------
     # Competitions
@@ -148,7 +159,8 @@ class JudoFetcher:
         async def worker(athlete_id: int, index: int) -> dict:
             async with semaphore:
                 if self.delay > 0:
-                    # Distribui o início das requisições ao longo do tempo para evitar surtos
+                    # Distribui o início das requisições ao longo do tempo
+                    # para evitar surtos
                     await asyncio.sleep(index * self.delay / self.max_concurrent)
                 return await self.fetch_athlete(athlete_id)
 
@@ -179,7 +191,11 @@ class JudoFetcher:
                 data = response.json()
                 if isinstance(data, list):
                     return data
-                if isinstance(data, dict) and "contests" in data and isinstance(data["contests"], list):
+                if (
+                    isinstance(data, dict)
+                    and "contests" in data
+                    and isinstance(data["contests"], list)
+                ):
                     return data["contests"]
                 return []
         except httpx.TimeoutException:

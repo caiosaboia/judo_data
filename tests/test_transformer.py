@@ -1,16 +1,13 @@
 """Testes para o módulo transformer — limpeza e transformação com Pandas."""
 
-import pytest
 import pandas as pd
-import numpy as np
 
+from judo_data.config import ATHLETE_COLUMNS, CONTEST_COLUMNS
 from judo_data.transformer import (
+    merge_datasets,
     transform_athletes,
     transform_contests,
-    merge_datasets,
 )
-from judo_data.config import ATHLETE_COLUMNS, CONTEST_COLUMNS
-
 
 # === Testes de transform_athletes ===
 
@@ -84,7 +81,7 @@ def test_transform_athletes_country_is_uppercase(raw_athletes):
 
 
 def test_transform_athletes_empty_input():
-    """transform_athletes com lista vazia deve retornar DataFrame vazio com colunas corretas."""
+    """transform_athletes com lista vazia retorna DataFrame vazio com colunas."""
     result = transform_athletes([])
     assert isinstance(result, pd.DataFrame)
     assert len(result) == 0
@@ -153,7 +150,7 @@ def test_transform_contests_location_is_string(raw_contests):
 
 
 def test_transform_contests_empty_input():
-    """transform_contests com lista vazia deve retornar DataFrame vazio com colunas corretas."""
+    """transform_contests com lista vazia retorna DataFrame vazio com colunas."""
     result = transform_contests([])
     assert isinstance(result, pd.DataFrame)
     assert len(result) == 0

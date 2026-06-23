@@ -4,7 +4,6 @@ import pandas as pd
 
 from judo_data.config import ATHLETE_COLUMNS, CONTEST_COLUMNS
 
-
 # Mapeamento de campos da API → schema do projeto
 _ATHLETE_FIELD_MAP = {
     "id_person": "athlete_id",
@@ -89,9 +88,7 @@ def transform_athletes(raw_data: list[dict]) -> pd.DataFrame:
     df["weight"] = pd.to_numeric(df["weight"], errors="coerce")
 
     # Deduplicação por athlete_id, mantém a primeira ocorrência
-    df = df.drop_duplicates(subset="athlete_id", keep="first").reset_index(drop=True)
-
-    return df
+    return df.drop_duplicates(subset="athlete_id", keep="first").reset_index(drop=True)
 
 
 def transform_contests(raw_data: list[dict]) -> pd.DataFrame:
@@ -174,5 +171,4 @@ def merge_datasets(
     )
     white["role"] = "white"
 
-    merged = pd.concat([blue, white], ignore_index=True)
-    return merged
+    return pd.concat([blue, white], ignore_index=True)
