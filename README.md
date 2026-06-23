@@ -1,8 +1,13 @@
-# Judo Data Pipeline
+# Judo's Data
 
 ![Judo Data Pipeline Banner](judo_banner.jpg)
 
 Uma pipeline em Python para extrair, limpar e exportar dados de competições de judô a partir da API pública da International Judo Federation (IJF).
+
+
+## Sinopse
+
+Sou Ciêntista de Dados, mas ainda sou Judoka!! Esse projeto foi devido a um gatilho gerado por uma disciplina de ML. Notei que tinhamos poucas fontes de dados 'reais' que poderiamos trabalhar de competições internacionais. Como eu fiz a parte da extração de dados de forma suja e rápida, resolvi lapidar essa primeira fase com os conhecimentos que obtive nos ultimos meses.
 
 
 ## Visão Geral
@@ -21,6 +26,12 @@ Este projeto realiza o processo de ETL (Extract, Transform, Load) dos dados da I
 - [uv](https://github.com/astral-sh/uv) (Recomendado) ou `pip` com ambiente virtual tradicional
 
 ## Instalação
+
+### Copie o Projeto
+
+```bash
+git clone https://github.com/caiosaboia/judo_data.git
+```
 
 ### Opção 1: Com `uv` (Recomendado)
 
@@ -112,3 +123,9 @@ pytest tests/ -v
 - `pandas`: Processamento e limpeza dos dados.
 - `pyarrow`: Engine de suporte para exportar em formato Parquet.
 - `pytest` / `pytest-asyncio` / `respx`: Testes unitários e mocks da API.
+
+
+## TODO's
+
+- Implementação de Paralelismo nas requisições de API
+- Mais formatos de dados para export
