@@ -20,6 +20,7 @@ from judo_data.config import (
 logger = logging.getLogger(__name__)
 logging.getLogger("httpx").setLevel(logging.WARNING)
 
+
 class JudoFetcher:
     """Cliente para buscar dados de judô na API pública da IJF.
 
@@ -45,9 +46,7 @@ class JudoFetcher:
         self.delay = delay if delay is not None else REQUEST_DELAY
         self.max_concurrent = max(
             1,
-            max_concurrent
-            if max_concurrent is not None
-            else MAX_CONCURRENT_REQUESTS,
+            max_concurrent if max_concurrent is not None else MAX_CONCURRENT_REQUESTS,
         )
 
     # ------------------------------------------------------------------

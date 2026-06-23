@@ -75,4 +75,3 @@ def export_all(
             export_parquet(df, output_dir / f"{name}.parquet")
         if "excel" in formats:
             export_excel(df, output_dir / f"{name}.xlsx")
-

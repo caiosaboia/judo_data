@@ -1,6 +1,5 @@
 """Testes para o módulo exporter — exportação de datasets em CSV e Parquet."""
 
-
 import pandas as pd
 import pytest
 
@@ -167,6 +166,7 @@ def test_export_excel_content_is_readable(sample_df, tmp_path):
 def test_export_sqlite_creates_file_with_tables(sample_df, tmp_path):
     """export_sqlite deve criar um arquivo .db e gravar as tabelas."""
     import sqlite3
+
     filepath = tmp_path / "test.db"
     datasets = {"athletes": sample_df, "competitions": sample_df}
     export_sqlite(datasets, filepath)

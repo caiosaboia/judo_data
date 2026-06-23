@@ -111,10 +111,7 @@ async def run_pipeline(
             return await fetcher.fetch_athlete(athlete_id)
 
     athlete_ids_list = list(athlete_ids)
-    tasks = [
-        worker_with_progress(aid, idx)
-        for idx, aid in enumerate(athlete_ids_list)
-    ]
+    tasks = [worker_with_progress(aid, idx) for idx, aid in enumerate(athlete_ids_list)]
     raw_athletes = await tqdm.gather(
         *tasks,
         desc="Capturando atletas",
@@ -213,7 +210,6 @@ def main():
     else:
         print(f"Arquivos salvos em: {DATA_DIR}")
     print("=" * 60)
-
 
 
 if __name__ == "__main__":

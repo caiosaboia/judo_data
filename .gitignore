@@ -9,3 +9,6 @@ wheels/
 # Virtual environments
 .venv
 AGENTS.md
+
+.pytest_cache/
+.ruff_cache/

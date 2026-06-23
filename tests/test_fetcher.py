@@ -14,9 +14,7 @@ from judo_data.fetcher import JudoFetcher
 @pytest.mark.asyncio
 async def test_fetch_competitions_returns_list(raw_competitions):
     """fetch_competitions deve retornar uma lista de dicts com competições."""
-    respx.get(BASE_URL).mock(
-        return_value=httpx.Response(200, json=raw_competitions)
-    )
+    respx.get(BASE_URL).mock(return_value=httpx.Response(200, json=raw_competitions))
 
     fetcher = JudoFetcher(delay=0)
     result = await fetcher.fetch_competitions(2024)
@@ -45,9 +43,7 @@ async def test_fetch_competitions_filters_by_year(raw_competitions):
 @pytest.mark.asyncio
 async def test_fetch_competitions_has_required_fields(raw_competitions):
     """Cada competição retornada deve ter id, name, city, country e datas."""
-    respx.get(BASE_URL).mock(
-        return_value=httpx.Response(200, json=raw_competitions)
-    )
+    respx.get(BASE_URL).mock(return_value=httpx.Response(200, json=raw_competitions))
 
     fetcher = JudoFetcher(delay=0)
     result = await fetcher.fetch_competitions(2024)
@@ -64,9 +60,7 @@ async def test_fetch_competitions_has_required_fields(raw_competitions):
 @pytest.mark.asyncio
 async def test_fetch_contests_returns_list(raw_contests):
     """fetch_contests deve retornar uma lista de lutas."""
-    respx.get(BASE_URL).mock(
-        return_value=httpx.Response(200, json=raw_contests)
-    )
+    respx.get(BASE_URL).mock(return_value=httpx.Response(200, json=raw_contests))
 
     fetcher = JudoFetcher(delay=0)
     result = await fetcher.fetch_contests(2653)
@@ -79,9 +73,7 @@ async def test_fetch_contests_returns_list(raw_contests):
 @pytest.mark.asyncio
 async def test_fetch_contests_passes_competition_id():
     """fetch_contests deve incluir o competition_id nos parâmetros."""
-    route = respx.get(BASE_URL).mock(
-        return_value=httpx.Response(200, json=[])
-    )
+    route = respx.get(BASE_URL).mock(return_value=httpx.Response(200, json=[]))
 
     fetcher = JudoFetcher(delay=0)
     await fetcher.fetch_contests(2653)
@@ -110,9 +102,7 @@ async def test_fetch_athlete_returns_dict():
         "height": 178,
         "weight": 81,
     }
-    respx.get(BASE_URL).mock(
-        return_value=httpx.Response(200, json=athlete_data)
-    )
+    respx.get(BASE_URL).mock(return_value=httpx.Response(200, json=athlete_data))
 
     fetcher = JudoFetcher(delay=0)
     result = await fetcher.fetch_athlete(1001)
@@ -130,18 +120,34 @@ async def test_fetch_athlete_returns_dict():
 async def test_fetch_all_athletes_returns_list():
     """fetch_all_athletes deve buscar múltiplos atletas e retornar lista."""
     athletes = [
-        {"id_person": 1001, "family_name": "Nagase", "given_name": "Takanori",
-         "country": "JPN", "gender": "male", "weight_category": "-81 kg",
-         "height": 178, "weight": 81},
-        {"id_person": 1002, "family_name": "Silva", "given_name": "Rafael",
-         "country": "BRA", "gender": "male", "weight_category": "+100 kg",
-         "height": 195, "weight": 130},
+        {
+            "id_person": 1001,
+            "family_name": "Nagase",
+            "given_name": "Takanori",
+            "country": "JPN",
+            "gender": "male",
+            "weight_category": "-81 kg",
+            "height": 178,
+            "weight": 81,
+        },
+        {
+            "id_person": 1002,
+            "family_name": "Silva",
+            "given_name": "Rafael",
+            "country": "BRA",
+            "gender": "male",
+            "weight_category": "+100 kg",
+            "height": 195,
+            "weight": 130,
+        },
     ]
     # Each call returns a single athlete
-    respx.get(BASE_URL).mock(side_effect=[
-        httpx.Response(200, json=athletes[0]),
-        httpx.Response(200, json=athletes[1]),
-    ])
+    respx.get(BASE_URL).mock(
+        side_effect=[
+            httpx.Response(200, json=athletes[0]),
+            httpx.Response(200, json=athletes[1]),
+        ]
+    )
 
     fetcher = JudoFetcher(delay=0)
     result = await fetcher.fetch_all_athletes([1001, 1002])
@@ -213,4 +219,3 @@ async def test_fetcher_has_max_concurrent_attribute():
 
     fetcher_default = JudoFetcher()
     assert fetcher_default.max_concurrent == 5
-
