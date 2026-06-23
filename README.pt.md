@@ -2,8 +2,6 @@
 
 ![Judo Data Pipeline Banner](judo_banner.jpg)
 
-**Idioma / Language:** [🇧🇷 Português](README.pt.md) | [🇺🇸 English](README.en.md)
-
 Uma pipeline em Python para extrair, limpar e exportar dados de competições de judô a partir da API pública da International Judo Federation (IJF).
 
 

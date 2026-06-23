@@ -17,6 +17,7 @@ dev = [
     "pytest-asyncio>=0.25",
     "respx>=0.22",
     "pytest-mock>=3.14",
+    "ruff",
 ]
 
 [tool.pytest.ini_options]
@@ -31,4 +32,43 @@ extra-paths = ["src"]
 extraPaths = ["src"]
 
 [tool.ruff]
+target-version = "py313"
+line-length = 88
+indent-width = 4
 src = ["src"]
+exclude = [
+    ".git",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "B",    # flake8-bugbear
+    "A",    # flake8-builtins
+    "C4",   # flake8-comprehensions
+    "PT",   # flake8-pytest-style
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "PTH",  # flake8-use-pathlib
+]
+ignore = []
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["judo_data"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
