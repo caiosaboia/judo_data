@@ -22,6 +22,16 @@ Este projeto realiza o processo de ETL (Extract, Transform, Load) dos dados da I
     - `judo_atle_compt`: Dataset unificado.
 3. **Carga (Exportação):** Salva os datasets em formatos populares para análise de dados (`.csv` e `.parquet`).
 
+## Fonte de Dados
+
+Os dados são extraídos diretamente da API pública da **International Judo Federation (IJF)**:
+- **API Base URL:** `https://data.ijf.org/api/get_json`
+- **Endpoints Utilizados (via parâmetro `action`):**
+  - `competition.get_list` — Obtém a lista de competições de um determinado ano.
+  - `contest.get_list` — Obtém todas as lutas associadas a uma competição.
+  - `competitor.get_list` — Obtém informações detalhadas de cada atleta/competidor.
+- **Autenticação:** Nenhuma (API pública).
+
 ## Requisitos
 
 - Python 3.13+
