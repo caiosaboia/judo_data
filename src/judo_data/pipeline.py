@@ -27,6 +27,7 @@ logger = logging.getLogger(__name__)
 
 async def run_pipeline(
     year: int,
+    start_year: int | None = None,
     output_dir: Path | None = None,
     formats: list[str] | None = None,
 ) -> dict[str, pd.DataFrame]:
@@ -35,7 +36,10 @@ async def run_pipeline(
     Parameters
     ----------
     year : int
-        Ano até o qual captar dados de competições.
+        Ano final (inclusive) até o qual captar dados de competições.
+    start_year : int, optional
+        Ano inicial (inclusive) a partir do qual captar dados. Se omitido,
+        será igual ao ``year`` (capta apenas o ano informado).
     output_dir : Path, optional
         Diretório de saída para os datasets. Usa ``config.DATA_DIR`` se não informado.
     formats : list[str], optional
@@ -53,12 +57,25 @@ async def run_pipeline(
     if formats is None:
         formats = EXPORT_FORMATS
 
+    if start_year is None:
+        start_year = year
+
     fetcher = JudoFetcher()
 
     # --- 1. Buscar competições ---
-    logger.info("Buscando competições do ano %d...", year)
-    raw_competitions = await fetcher.fetch_competitions(year)
-    logger.info("Encontradas %d competições.", len(raw_competitions))
+    if start_year == year:
+        logger.info("Buscando competições do ano %d...", year)
+        raw_competitions = await fetcher.fetch_competitions(year)
+    else:
+        logger.info("Buscando competições de %d até %d...", start_year, year)
+        raw_competitions = []
+        for y in range(start_year, year + 1):
+            logger.info("Buscando competições do ano %d...", y)
+            comps = await fetcher.fetch_competitions(y)
+            raw_competitions.extend(comps)
+            if fetcher.delay > 0 and y < year:
+                await asyncio.sleep(fetcher.delay)
+    logger.info("Encontradas %d competições no total.", len(raw_competitions))
 
     # --- 2. Buscar lutas de cada competição ---
     all_raw_contests: list[dict] = []
@@ -105,9 +122,9 @@ async def run_pipeline(
 
     async def worker_with_progress(athlete_id: int, index: int) -> dict:
         """Worker que busca um atleta e atualiza a barra de progresso."""
+        if fetcher.delay > 0:
+            await asyncio.sleep(index * fetcher.delay / fetcher.max_concurrent)
         async with semaphore:
-            if fetcher.delay > 0:
-                await asyncio.sleep(index * fetcher.delay / fetcher.max_concurrent)
             return await fetcher.fetch_athlete(athlete_id)
 
     athlete_ids_list = list(athlete_ids)
@@ -165,11 +182,23 @@ def main():
     print()
 
     try:
-        year_input = input("Até qual ano deseja captar os dados? ")
+        year_input = input("Até qual ano deseja captar os dados? (Ano Final): ")
         year = int(year_input.strip())
     except (ValueError, EOFError):
         print("Erro: informe um ano válido (ex: 2024)")
         sys.exit(1)
+
+    try:
+        start_year_input = input(
+            f"A partir de qual ano deseja captar os dados? (Padrão: {year}): "
+        )
+        start_year_str = start_year_input.strip()
+        start_year = int(start_year_str) if start_year_str else year
+        if start_year > year:
+            print("Erro: o ano inicial não pode ser maior que o ano final.")
+            sys.exit(1)
+    except (ValueError, EOFError):
+        start_year = year
 
     print("\nEscolha o formato de exportação:")
     print("  1. parquet (Padrão)")
@@ -190,13 +219,19 @@ def main():
     else:
         selected_format = "parquet"
 
+    if start_year == year:
+        msg = f"para o ano {year}"
+    else:
+        msg = f"do ano {start_year} até {year}"
+
     print(
-        f"\nIniciando pipeline para o ano {year} "
-        f"com exportação em formato '{selected_format}'..."
+        f"\nIniciando pipeline {msg} com exportação em formato '{selected_format}'..."
     )
     print()
 
-    datasets = asyncio.run(run_pipeline(year=year, formats=[selected_format]))
+    datasets = asyncio.run(
+        run_pipeline(year=year, start_year=start_year, formats=[selected_format])
+    )
 
     print()
     print("=" * 60)

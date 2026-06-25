@@ -56,10 +56,41 @@ CONTEST_COLUMNS = [
     "athlete_blue_id",
     "athlete_white_id",
     "winner_id",
+    "winner_color",
     "fight_duration",
     "score_blue",
     "score_white",
+    "blue_ippon",
+    "blue_wazari",
+    "blue_yuko",
+    "blue_shido",
+    "blue_hansoukomake",
+    "white_ippon",
+    "white_wazari",
+    "white_yuko",
+    "white_shido",
+    "white_hansoukomake",
     "round",
 ]
 
-MERGED_COLUMNS = ATHLETE_COLUMNS + CONTEST_COLUMNS + ["role"]
+BLUE_ATHLETE_COLUMNS = [
+    "blue_first_name",
+    "blue_last_name",
+    "blue_country",
+    "blue_gender",
+    "blue_weight_category",
+    "blue_height",
+    "blue_weight",
+]
+
+WHITE_ATHLETE_COLUMNS = [
+    "white_first_name",
+    "white_last_name",
+    "white_country",
+    "white_gender",
+    "white_weight_category",
+    "white_height",
+    "white_weight",
+]
+
+MERGED_COLUMNS = CONTEST_COLUMNS + BLUE_ATHLETE_COLUMNS + WHITE_ATHLETE_COLUMNS

@@ -89,13 +89,14 @@ async def test_pipeline_contests_df_not_empty(mock_fetcher, tmp_path):
 
 
 @pytest.mark.asyncio
-async def test_pipeline_merged_df_has_role_column(mock_fetcher, tmp_path):
-    """Dataset unificado deve conter coluna 'role'."""
+async def test_pipeline_merged_df_has_side_by_side_columns(mock_fetcher, tmp_path):
+    """Dataset unificado deve conter colunas de ambos os atletas."""
     with patch("judo_data.pipeline.JudoFetcher", return_value=mock_fetcher):
         result = await run_pipeline(year=2024, output_dir=tmp_path)
 
     merged_key = DATASET_NAMES["merged"]
-    assert "role" in result[merged_key].columns
+    assert "blue_first_name" in result[merged_key].columns
+    assert "white_first_name" in result[merged_key].columns
 
 
 @pytest.mark.asyncio
@@ -119,3 +120,16 @@ async def test_pipeline_creates_sqlite_output(mock_fetcher, tmp_path):
     assert (tmp_path / "judo_data.db").exists()
     for _, name in DATASET_NAMES.items():
         assert not (tmp_path / f"{name}.csv").exists()
+
+
+@pytest.mark.asyncio
+async def test_pipeline_calls_fetcher_with_year_range(mock_fetcher, tmp_path):
+    """Pipeline deve chamar fetch_competitions para todos os anos no range."""
+    with patch("judo_data.pipeline.JudoFetcher", return_value=mock_fetcher):
+        await run_pipeline(year=2024, start_year=2022, output_dir=tmp_path)
+
+    assert mock_fetcher.fetch_competitions.call_count == 3
+    called_years = [
+        call[0][0] for call in mock_fetcher.fetch_competitions.call_args_list
+    ]
+    assert called_years == [2022, 2023, 2024]

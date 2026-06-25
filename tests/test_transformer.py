@@ -128,6 +128,52 @@ def test_transform_contests_converts_duration_to_seconds(raw_contests):
     assert row["fight_duration"].values[0] == 155
 
 
+def test_duration_to_seconds_robustness():
+    """_duration_to_seconds deve lidar de forma robusta com diversos formatos."""
+    import numpy as np
+
+    from judo_data.transformer import _duration_to_seconds
+
+    assert _duration_to_seconds("4:00") == 240
+    assert _duration_to_seconds("2:35") == 155
+    assert _duration_to_seconds(240) == 240
+    assert _duration_to_seconds(155.0) == 155
+    assert _duration_to_seconds("240") == 240
+    assert _duration_to_seconds(None) == 0
+    assert _duration_to_seconds(np.nan) == 0
+    assert _duration_to_seconds("invalid") == 0
+    assert _duration_to_seconds("") == 0
+
+
+def test_format_score_robustness():
+    """_format_score deve formatar placares da API de forma robusta."""
+    from judo_data.transformer import _format_score
+
+    assert _format_score("1", "0", "0", "0") == "Ippon"
+    assert _format_score("0", "1", "0", "2") == "Waza-ari, 2 Shido"
+    assert _format_score("0", "0", "1", "1") == "Yuko, 1 Shido"
+    assert _format_score(None, None, None, None) == ""
+
+
+def test_transform_athletes_fallbacks():
+    """Testa fallbacks de país, categorias e peso em transform_athletes."""
+    raw = [
+        {
+            "id_person": 1009,
+            "family_name": "Silva",
+            "given_name": "Rafael",
+            "country_short": "BRA",
+            "gender": "male",
+            "categories": ["-100", "+100"],
+            "height": 195,
+        }
+    ]
+    df = transform_athletes(raw)
+    assert df["country"].values[0] == "BRA"
+    assert df["weight_category"].values[0] == "-100"
+    assert df["weight"].values[0] == 100.0
+
+
 def test_transform_contests_date_is_datetime(raw_contests):
     """Coluna date deve ser do tipo datetime."""
     result = transform_contests(raw_contests)
@@ -141,6 +187,23 @@ def test_transform_contests_handles_null_winner(raw_contests):
     # Contest 10003 tem id_winner=None no mock
     row = result[result["contest_id"] == 10003]
     assert row["winner_id"].isna().all()
+
+
+def test_transform_contests_populates_winner_color(raw_contests):
+    """winner_color deve ser populado com 'blue', 'white' ou None."""
+    result = transform_contests(raw_contests)
+
+    # Contest 10001: winner_id=1001 (athlete_blue_id=1001) -> winner_color='blue'
+    row_blue = result[result["contest_id"] == 10001]
+    assert row_blue["winner_color"].values[0] == "blue"
+
+    # Contest 10002: winner_id=1004 (athlete_white_id=1004) -> winner_color='white'
+    row_white = result[result["contest_id"] == 10002]
+    assert row_white["winner_color"].values[0] == "white"
+
+    # Contest 10003: winner_id=None -> winner_color=None/NaN
+    row_none = result[result["contest_id"] == 10003]
+    assert pd.isna(row_none["winner_color"].values[0])
 
 
 def test_transform_contests_location_is_string(raw_contests):
@@ -167,28 +230,29 @@ def test_merge_datasets_returns_dataframe(sample_athletes_df, sample_contests_df
     assert isinstance(result, pd.DataFrame)
 
 
-def test_merge_datasets_has_role_column(sample_athletes_df, sample_contests_df):
-    """DataFrame unificado deve ter coluna 'role' com valores 'blue'/'white'."""
-    result = merge_datasets(sample_athletes_df, sample_contests_df)
-    assert "role" in result.columns
-    assert set(result["role"].unique()).issubset({"blue", "white"})
-
-
-def test_merge_datasets_doubles_rows(sample_athletes_df, sample_contests_df):
-    """Cada luta deve gerar 2 linhas (uma por atleta)."""
+def test_merge_datasets_has_side_by_side_athlete_info(
+    sample_athletes_df, sample_contests_df
+):
+    """DataFrame unificado deve conter informações de ambos os atletas lado a lado."""
     result = merge_datasets(sample_athletes_df, sample_contests_df)
 
-    # 2 lutas no mock -> 4 linhas (2 por luta)
-    assert len(result) == 4
+    # Verifica colunas do atleta azul
+    assert "blue_first_name" in result.columns
+    assert "blue_last_name" in result.columns
+    assert "blue_country" in result.columns
+
+    # Verifica colunas do atleta branco
+    assert "white_first_name" in result.columns
+    assert "white_last_name" in result.columns
+    assert "white_country" in result.columns
 
 
-def test_merge_datasets_contains_athlete_info(sample_athletes_df, sample_contests_df):
-    """Cada linha deve conter informações do atleta."""
+def test_merge_datasets_keeps_row_count(sample_athletes_df, sample_contests_df):
+    """Cada luta deve gerar exatamente 1 linha."""
     result = merge_datasets(sample_athletes_df, sample_contests_df)
 
-    assert "first_name" in result.columns
-    assert "last_name" in result.columns
-    assert "country" in result.columns
+    # 2 lutas no mock -> 2 linhas no resultado
+    assert len(result) == len(sample_contests_df)
 
 
 def test_merge_datasets_contains_contest_info(sample_athletes_df, sample_contests_df):
@@ -205,6 +269,7 @@ def test_merge_datasets_empty_athletes(sample_contests_df):
     empty_athletes = pd.DataFrame(columns=ATHLETE_COLUMNS)
     result = merge_datasets(empty_athletes, sample_contests_df)
     assert isinstance(result, pd.DataFrame)
+    assert len(result) == 0
 
 
 def test_merge_datasets_empty_contests(sample_athletes_df):

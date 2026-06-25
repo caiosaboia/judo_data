@@ -123,6 +123,15 @@ class JudoFetcher:
                 data = response.json()
                 if isinstance(data, dict):
                     data["id_person"] = int(athlete_id)
+                    given_name = data.get("given_name") or ""
+                    family_name = data.get("family_name") or ""
+                    name_str = f"{given_name} {family_name}".strip()
+                    if name_str:
+                        logger.info(
+                            "Atleta capturado: ID %s - %s", athlete_id, name_str
+                        )
+                    else:
+                        logger.info("Atleta capturado: ID %s", athlete_id)
                 return data
         except httpx.TimeoutException:
             logger.error("Timeout ao buscar atleta %s", athlete_id)
@@ -156,11 +165,11 @@ class JudoFetcher:
         semaphore = asyncio.Semaphore(self.max_concurrent)
 
         async def worker(athlete_id: int, index: int) -> dict:
+            if self.delay > 0:
+                # Distribui o início das requisições ao longo do tempo
+                # para evitar surtos
+                await asyncio.sleep(index * self.delay / self.max_concurrent)
             async with semaphore:
-                if self.delay > 0:
-                    # Distribui o início das requisições ao longo do tempo
-                    # para evitar surtos
-                    await asyncio.sleep(index * self.delay / self.max_concurrent)
                 return await self.fetch_athlete(athlete_id)
 
         tasks = [worker(aid, idx) for idx, aid in enumerate(athlete_ids)]

@@ -48,6 +48,7 @@ Fonte: API pública da IJF (International Judo Federation) em `data.ijf.org`.
 | athlete_blue_id | int | ✅ |
 | athlete_white_id | int | ✅ |
 | winner_id | int | ❌ (null se empate/desclassificação) |
+| winner_color | str | ❌ (lado do vencedor: 'blue', 'white' ou null) |
 | fight_duration | int (segundos) | ✅ |
 | score_blue | str | ❌ |
 | score_white | str | ❌ |
@@ -55,7 +56,7 @@ Fonte: API pública da IJF (International Judo Federation) em `data.ijf.org`.
 
 ### 3. `judo_atle_compt` — União dos dois
 Merge de `judo_atle` + `judo_compt` via `athlete_id`.
-Cada luta gera 2 linhas (uma para cada atleta), com coluna `role` ("blue"/"white").
+Cada luta gera exatamente 1 linha contendo as informações da luta e de ambos os atletas lado a lado (com colunas prefixadas por `blue_` e `white_`).
 
 ## Estrutura do Projeto
 ```

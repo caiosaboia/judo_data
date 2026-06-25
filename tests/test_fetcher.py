@@ -219,3 +219,46 @@ async def test_fetcher_has_max_concurrent_attribute():
 
     fetcher_default = JudoFetcher()
     assert fetcher_default.max_concurrent == 5
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_fetch_athlete_logs_success(caplog):
+    """fetch_athlete deve registrar um log quando o atleta é capturado com sucesso."""
+    athlete_data = {
+        "id_person": 1001,
+        "family_name": "Nagase",
+        "given_name": "Takanori",
+    }
+    respx.get(BASE_URL).mock(return_value=httpx.Response(200, json=athlete_data))
+
+    import logging
+
+    fetcher = JudoFetcher(delay=0)
+    with caplog.at_level(logging.INFO):
+        await fetcher.fetch_athlete(1001)
+
+    assert any(
+        "Atleta capturado: ID 1001 - Takanori Nagase" in record.message
+        for record in caplog.records
+    )
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_fetch_athlete_logs_success_no_name(caplog):
+    """fetch_athlete deve registrar ID do atleta no log quando não há nome."""
+    athlete_data = {
+        "id_person": 1001,
+    }
+    respx.get(BASE_URL).mock(return_value=httpx.Response(200, json=athlete_data))
+
+    import logging
+
+    fetcher = JudoFetcher(delay=0)
+    with caplog.at_level(logging.INFO):
+        await fetcher.fetch_athlete(1001)
+
+    assert any(
+        "Atleta capturado: ID 1001" in record.message for record in caplog.records
+    )
