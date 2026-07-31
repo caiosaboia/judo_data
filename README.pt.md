@@ -102,6 +102,16 @@ Os dados são exportados para a pasta `data/` nos formatos `.csv` e `.parquet`.
 - `judo_compt`
 - `judo_atle_compt`
 
+## Modelagem de Banco de Dados (SQL DDL)
+
+O projeto inclui scripts SQL DDL prontos para criar as tabelas correspondentes aos conjuntos de dados no seu banco relacional. Eles estão localizados na pasta [`sql/`](file:///C:/Users/cocad/projetos/judo_data/sql):
+
+- [`judo_atle.sql`](file:///C:/Users/cocad/projetos/judo_data/sql/judo_atle.sql): Tabela de atletas (perfis, categorias, altura/peso).
+- [`judo_compt.sql`](file:///C:/Users/cocad/projetos/judo_data/sql/judo_compt.sql): Tabela de lutas/competições com chaves estrangeiras e índices otimizados.
+- [`judo_atle_compt.sql`](file:///C:/Users/cocad/projetos/judo_data/sql/judo_atle_compt.sql): Estrutura consolidada para modelagem e Machine Learning (disponibilizada como tabela ou como uma `VIEW` relacional dinâmica).
+
+Estes scripts utilizam `CREATE TABLE IF NOT EXISTS` e são compatíveis com bancos de dados relacionais populares como PostgreSQL e SQLite.
+
 ## Como Executar os Testes
 
 O projeto segue a metodologia TDD (Test-Driven Development) e possui testes cobrindo todas as fases.
