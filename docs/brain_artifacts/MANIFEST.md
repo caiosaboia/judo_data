@@ -2,14 +2,15 @@
 
 - Projeto: `C:\Users\cocad\projetos\judo_data`
 - Lote: `Lote 2`
-- Data de Transferencia: `2026-11-13 16:32:13`
+- Data de Transferencia: `2026-11-13 16:50:03`
 - Total de Arquivos Transferidos: `6`
 
 ## Sessao: e1cf4335-ce0a-4dc0-b5ac-8ad124cb5e4c
-- Titulo: Sem Titulo
-- Ultima Modificacao: 2026-11-13 18:51:59.3599373+00:00
-- Interacoes / Passos: 727
+- Titulo: Configuração Ruff No Pyproject
+- Ultima Modificacao: 2026-11-13 19:40:51
+- Interacoes / Passos: 774
 - Diretorio Fonte: `C:\Users\cocad\.gemini\antigravity-cli\brain\e1cf4335-ce0a-4dc0-b5ac-8ad124cb5e4c`
+- Diretorio de Destino: `docs/brain_artifacts/e1cf4335-ce0a-4dc0-b5ac-8ad124cb5e4c/`
 - Quantidade de Arquivos: 4
 
 ### Lista de Arquivos
@@ -19,10 +20,11 @@
 - `walkthrough.md` (1683 bytes)
 
 ## Sessao: 563d7090-31f8-421a-bd27-aea1fca7b2cf
-- Titulo: Sem Titulo
-- Ultima Modificacao: 2026-06-23 13:43:21.9630144+00:00
+- Titulo: Seleção de Formatos de Dados
+- Ultima Modificacao: 2026-06-23 13:43:21
 - Interacoes / Passos: 106
 - Diretorio Fonte: `C:\Users\cocad\.gemini\antigravity-cli\brain\563d7090-31f8-421a-bd27-aea1fca7b2cf`
+- Diretorio de Destino: `docs/brain_artifacts/563d7090-31f8-421a-bd27-aea1fca7b2cf/`
 - Quantidade de Arquivos: 2
 
 ### Lista de Arquivos
