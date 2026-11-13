@@ -20,6 +20,10 @@ Este projeto realiza o processo de ETL (Extract, Transform, Load) dos dados da I
     - `judo_atle_compt`: Dataset unificado.
 3. **Carga (Exportação):** Salva os datasets em formatos populares para análise de dados (`.csv` e `.parquet`).
 
+## Demo
+
+![Demo do Judo Data Pipeline](assets/demo.gif)
+
 ## Requisitos
 
 - Python 3.13+

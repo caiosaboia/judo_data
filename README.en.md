@@ -20,6 +20,10 @@ This project performs the ETL (Extract, Transform, Load) process for IJF data:
     - `judo_atle_compt`: Unified dataset.
 3. **Load (Export):** Saves the datasets in popular formats for data analysis (`.csv` and `.parquet`).
 
+## Demo
+
+![Judo Data Pipeline Demo](assets/demo.gif)
+
 ## Requirements
 
 - Python 3.13+
