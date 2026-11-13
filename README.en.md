@@ -78,15 +78,23 @@ pip install -r requirements.txt
 
 ### With `uv`:
 
-To start the pipeline, run:
+To start the pipeline, run the project CLI command:
 
 ```powershell
-uv run python main.py
+uv run judo-data
 ```
+
+*(You can also use the shorthand `uv run judo` or `uv run python main.py`)*
 
 ### Without `uv` (With active virtual environment):
 
-To start the pipeline, run:
+If installed in editable mode (`pip install -e .`):
+
+```powershell
+judo-data
+```
+
+Or run via Python directly:
 
 ```powershell
 python main.py
