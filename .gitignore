@@ -13,3 +13,10 @@ AGENTS.md
 .pytest_cache/
 .ruff_cache/
 .brain
+
+# Raw demo videos (keep only converted .gif)
+assets/*.mp4
+assets/*.mov
+assets/*.mkv
+assets/*.avi
+assets/*.webm
